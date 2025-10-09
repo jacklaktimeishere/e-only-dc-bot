@@ -38,7 +38,7 @@ async def enforce_e_only(message: discord.Message):
 async def on_message(message: discord.Message):
     await enforce_e_only(message)
 
-@bot.tree.command(name="exempt")
+@bot.tree.command(name="exempt", description="Exempt a member.")
 async def exempt(interaction: discord.Interaction, member: discord.Member):
     exempt_role = discord.utils.get(interaction.guild.roles, name="Exempt")
     staff_role = discord.utils.get(interaction.guild.roles, name="Staff")
@@ -51,7 +51,7 @@ async def exempt(interaction: discord.Interaction, member: discord.Member):
     await member.add_roles(exempt_role)
     await interaction.response.send_message(f"Exempted {member.mention}.")
 
-@bot.tree.command(name="de-exempt")
+@bot.tree.command(name="de-exempt", description="De-exempt a member.")
 async def de_exempt(interaction: discord.Interaction, member: discord.Member):
     exempt_role = discord.utils.get(interaction.guild.roles, name="Exempt")
     staff_role = discord.utils.get(interaction.guild.roles, name="Staff")
