@@ -46,7 +46,7 @@ async def exempt(ctx, member: discord.Member):
         await ctx.send(f'{ctx.author.mention}, you need Staff to exempt members.', delete_after=5)
         return
     if exempt_role in member.roles:
-        await ctx.send(f'{ctx.author.mention}, {member.mention} is already exempted.', delete_after=5)
+        await ctx.send(f'{ctx.author.mention}, that member is already exempted.', delete_after=5)
         return
     await member.add_roles(exempt_role)
     await ctx.send(f"Exempted {member.mention}.")
@@ -64,7 +64,7 @@ async def de_exempt(ctx, member: discord.Member):
         await ctx.send(f'{ctx.author.mention}, you need Staff to de-exempt members.', delete_after=5)
         return
     if exempt_role not in member.roles:
-        await ctx.send(f'{ctx.author.mention}, {member.mention} isn\'t exempted.', delete_after=5)
+        await ctx.send(f'{ctx.author.mention}, that member isn\'t exempted.', delete_after=5)
         return
     if ctx.author == member:
         await ctx.send(f'{ctx.author.mention}, you probably don\'t want to de-exempt yourself.', delete_after=5)
