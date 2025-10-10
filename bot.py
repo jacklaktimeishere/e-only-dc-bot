@@ -27,7 +27,7 @@ async def render(punishment, reason, expires):
     return f"""Hello,
 you have been {punishment} in the \"Epic E Enforcement\" server.
 Reason: {reason}
-{'<t:'+str(expires)+':R>' if expires else ""}
+Expires: {'<t:'+str(expires)+':R>' if expires else ""}
 Punishments may take a few minutes to be fully removed.
 """
 
