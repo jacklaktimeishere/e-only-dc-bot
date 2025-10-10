@@ -89,6 +89,8 @@ async def on_ready():
 
 async def enforce_e_only(message: discord.Message):
     """Delete messages that break the E-only rule."""
+    if not message.guild:
+        return
     if message.author.bot:
         return
     content = set(message.content.lower())
