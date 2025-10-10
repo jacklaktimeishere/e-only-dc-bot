@@ -95,7 +95,7 @@ async def enforce_e_only(message: discord.Message):
         return
     content = set(message.content.lower())
     role_names = [role.name for role in message.author.roles]
-    if not content.issubset(ALLOWED_CHARS) and "Exempt" not in role_names:
+    if (not content.issubset(ALLOWED_CHARS) or message.attachments) and "Exempt" not in role_names:
         try:
             await message.delete()
             await message.channel.send(f"{message.author.mention}, messages must consist only of allowed characters (e, whitespace, punctuation).", delete_after=5)
