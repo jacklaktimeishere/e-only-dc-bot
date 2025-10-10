@@ -27,12 +27,13 @@ async def render(punishment, reason, expires):
     return f"""Hello,
 you have been {punishment} in the \"Epic E Enforcement\" server.
 Reason: {reason}
-Expires: <t:{expires}:R>
+{'<t:'+str(expires)+':R>' if expires else ""}
 Punishments may take a few minutes to be fully removed.
 """
 
 @tasks.loop(seconds=30)
 async def check_warns():
+    global supabase
     now = datetime.now(timezone.utc).isoformat()
     expired = await supabase.table("warns").select("*").lt("expires", now).execute()
 
@@ -45,7 +46,8 @@ async def before_check_warns():
     await bot.wait_until_ready()
 
 @tasks.loop(seconds=30)
-async def check_mutes():
+async def check_mutes(): # this function made me lose my sanity
+    global supabase
     now = datetime.now(timezone.utc).isoformat()
 
     expired = await supabase.table("mutes").select("*").lt("expires", now).execute()
@@ -180,6 +182,31 @@ async def mute(interaction: discord.Interaction, member: discord.Member, reason:
         "expires": expires.isoformat(),
         "reason": reason
     }).execute()
+
+@bot.tree.command(name="unmute", description="Unmute a member.")
+async def unmute(interaction: discord.Interaction, member: discord.Member, reason: str):
+    global supabase
+    staff_role = discord.utils.get(interaction.guild.roles, name="Staff")
+    muted_role = discord.utils.get(interaction.guild.roles, name="Muted")
+    if staff_role not in interaction.user.roles:
+        await interaction.response.send_message("You need Staff to unmute members.", ephemeral=True)
+        return
+    if muted_role not in member.roles:
+        await interaction.response.send_message("That member is not muted.", ephemeral=True)
+        return
+    rendered_message = await render("unmuted", reason, None)
+    try:
+        await member.send(rendered_message)
+    except discord.Forbidden:
+        pass
+    await member.remove_roles(muted_role)
+    await interaction.response.send_message(f"{member.mention} unmuted.")
+    await supabase.table("mutes").delete().eq("user_id", member.id).execute()
+
+@bot.tree.error
+async def all_commands_error(interaction: discord.Interaction, error):
+    if isinstance(error, app_commands.TransformerError):
+        await interaction.response.send_message("You need to be in a guild to use this command.", ephemeral=True)
 
 @bot.event
 async def on_message_edit(before: discord.Message, after: discord.Message):
