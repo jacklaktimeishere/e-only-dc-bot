@@ -57,20 +57,18 @@ async def check_mutes():
 
     await supabase.table("mutes").delete().in_("id", mute_ids).execute()
 
-    for guild in bot.guilds:
-        role = discord.utils.get(guild.roles, name="Muted")
-        if not role:
-            continue
+    guild = bot.get_guild(1425229583103561781)
+    role = discord.utils.get(guild.roles, name="Muted")
 
-        members = []
-        for user_id in user_ids:
-            member = guild.get_member(user_id)
-            if member is None:
-                try:
-                    member = await guild.fetch_member(user_id)
-                except discord.NotFound:
-                    continue
-            members.append(member)
+    members = []
+    for user_id in user_ids:
+        member = guild.get_member(user_id)
+        if member is None:
+            try:
+                member = await guild.fetch_member(user_id)
+            except discord.NotFound:
+                continue
+        members.append(member)
 
         if members:
             await asyncio.gather(*(member.remove_roles(role) for member in members))
